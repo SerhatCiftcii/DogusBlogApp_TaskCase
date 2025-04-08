@@ -9,8 +9,7 @@ namespace BlogApp.ViewModels
         [StringLength(500, ErrorMessage = "{0} alanı en fazla {1} karakter olabilir.")]
         public string Text { get; set; } = null!;
 
-        // Blog ID'si genellikle formda gizli bir alan olarak gönderilir veya
-        // yönlendirme bilgisinden alınır. Burada doğrudan modelde olmayabilir.
-        public int BlogId { get; set; }
+        [Required]
+        public int BlogId { get; set; } // Eklendi ve zorunlu hale getirildi
     }
 }

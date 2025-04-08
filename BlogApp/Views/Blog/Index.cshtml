@@ -13,6 +13,7 @@
             <th>Yayın Tarihi</th>
             <th>Kategori</th>
             <th>Yazar</th>
+            <th>Image</th>
             <th></th>
         </tr>
     </thead>
@@ -24,6 +25,16 @@
                 <td>@Html.DisplayFor(modelItem => item.PublishDate)</td>
                 <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
                 <td>@Html.DisplayFor(modelItem => item.AuthorUsername)</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                    {
+                        <img src="~/@item.ImagePath" alt="@item.Title" style="max-width: 50px;;" />
+                    }
+                    else
+                    {
+                        <span>Görsel Yok</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id">Detaylar</a> |
                     <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a> |

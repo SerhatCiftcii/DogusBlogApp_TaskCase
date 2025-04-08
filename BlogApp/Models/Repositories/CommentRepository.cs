@@ -16,6 +16,11 @@ namespace BlogApp.Models.Repositories
             _context = context;
         }
 
+        public async Task<Comment?> GetByIdAsync(int id) // Implemente edildi
+        {
+            return await _context.Comments.FindAsync(id);
+        }
+
         public async Task<List<Comment>> GetCommentsByBlogIdAsync(int blogId)
         {
             return await _context.Comments
@@ -27,6 +32,12 @@ namespace BlogApp.Models.Repositories
         public async Task AddAsync(Comment comment)
         {
             await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Comment comment) // Implemente edildi
+        {
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
         }
     }

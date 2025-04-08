@@ -46,5 +46,14 @@ namespace BlogApp.Models.Repositories
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
         }
+        public async Task<Blog?> GetBlogByIdWithCommentsAsync(int id)
+        {
+            return await _context.Blogs
+                .Include(b => b.User)
+                .Include(b => b.Category)
+                .Include(b => b.Comments)
+                    .ThenInclude(c => c.User) // Yorumu yazan kullanıcıyı da yükleyebiliriz
+                .FirstOrDefaultAsync(b => b.Id == id);
+        }
     }
 }

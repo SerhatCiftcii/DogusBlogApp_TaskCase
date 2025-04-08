@@ -20,6 +20,23 @@ namespace BlogApp.Services
             _userRepository = userRepository;
         }
 
+        public async Task<CommentViewModel?> GetCommentByIdAsync(int id) // Implemente edildi
+        {
+            var comment = await _commentRepository.GetByIdAsync(id);
+            if (comment == null)
+            {
+                return null;
+            }
+            return new CommentViewModel
+            {
+                Id = comment.Id,
+                Text = comment.Text,
+                CreatedDate = comment.CreatedDate,
+                AuthorUsername = comment.User?.Username ?? "Bilinmeyen Yazar",
+                
+            };
+        }
+
         public async Task<List<CommentViewModel>> GetCommentsByBlogIdAsync(int blogId)
         {
             var comments = await _commentRepository.GetCommentsByBlogIdAsync(blogId);
@@ -29,11 +46,11 @@ namespace BlogApp.Services
                 Text = c.Text,
                 CreatedDate = c.CreatedDate,
                 AuthorUsername = c.User?.Username ?? "Bilinmeyen Yazar",
-                BlogId = c.BlogId
+               
             }).ToList();
         }
 
-        public async Task CreateCommentAsync(CommentCreateViewModel model, int userId)
+        public async Task CreateCommentAsync(CommentCreateViewModel model, int userId, int blogId) // BlogId parametresi güncellendi
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user != null)
@@ -43,11 +60,21 @@ namespace BlogApp.Services
                     Text = model.Text,
                     CreatedDate = DateTime.Now,
                     UserId = userId,
-                    BlogId = model.BlogId
+                    BlogId = blogId
                 };
                 await _commentRepository.AddAsync(newComment);
             }
             // TODO: Hata yönetimi eklenebilir.
+        }
+
+        public async Task DeleteCommentAsync(int id) // Implemente edildi
+        {
+            var commentToDelete = await _commentRepository.GetByIdAsync(id);
+            if (commentToDelete != null)
+            {
+                await _commentRepository.DeleteAsync(commentToDelete);
+            }
+            // TODO: Yetkilendirme kontrolü eklenebilir (sadece yorum sahibi veya admin silebilir).
         }
     }
 }

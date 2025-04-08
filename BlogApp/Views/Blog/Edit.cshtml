@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -18,9 +18,12 @@
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label asp-for="Image" class="control-label"></label>
+                <input asp-for="Image" type="file" class="form-control" /> <span asp-validation-for="Image" class="text-danger"></span>
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="~/@Model.ImagePath" alt="Mevcut Görsel" class="img-thumbnail" style="max-width: 200px;" />
+                }
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>

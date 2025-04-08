@@ -9,6 +9,7 @@ namespace BlogApp.Services.Interfaces
         Task<List<CategoryViewModel>> GetAllCategoriesAsync();
         Task<CategoryViewModel?> GetCategoryByIdAsync(int id);
         Task CreateCategoryAsync(CategoryViewModel model);
-        // Güncelleme ve silme işlemleri de eklenebilir.
+        Task UpdateCategoryAsync(CategoryViewModel model);
+        Task DeleteCategoryAsync(int id);
     }
 }

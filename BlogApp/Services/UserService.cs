@@ -37,23 +37,19 @@ namespace BlogApp.Services
             return true;
         }
 
-        public async Task<UserLoginViewModel?> LoginUserAsync(UserLoginViewModel model)
+        public async Task<User?> LoginUserAsync(UserLoginViewModel model)
         {
-            var user = await _userRepository.GetByUsernameAsync(model.Username);
+            var user = await _userRepository.GetByEmailAsync(model.Email);
 
             if (user != null && VerifyPassword(model.Password, user.PasswordHash))
             {
-                return new UserLoginViewModel
-                {
-                    Username = user.Username,
-                    RememberMe = model.RememberMe // Gerekirse kullanılacak
-                };
+                return user;
             }
 
-            return null; // Giriş başarısız
+            return null;
         }
 
-        private string HashPassword(string password)
+        public string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
             {
@@ -70,5 +66,8 @@ namespace BlogApp.Services
                 return Convert.ToBase64String(hashedBytes) == hashedPassword;
             }
         }
+
+
+      
     }
 }

@@ -11,5 +11,6 @@ namespace BlogApp.Models.Repositories
         Task AddAsync(Blog blog);
         Task UpdateAsync(Blog blog);
         Task DeleteAsync(Blog blog);
+        Task<Blog?> GetBlogByIdWithCommentsAsync(int id);
     }
 }

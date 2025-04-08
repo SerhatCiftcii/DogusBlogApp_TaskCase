@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering; // SelectList için
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 
 namespace BlogApp.ViewModels
 {
@@ -15,14 +16,13 @@ namespace BlogApp.ViewModels
         [Display(Name = "İçerik")]
         public string Content { get; set; } = null!;
 
-        [Display(Name = "Görsel URL")]
-        public string? ImageUrl { get; set; }
+        [Display(Name = "Görsel")]
+        public IFormFile? Image { get; set; } // Değiştirildi
 
         [Required(ErrorMessage = "{0} alanı zorunludur.")]
         [Display(Name = "Kategori")]
         public int CategoryId { get; set; }
 
-        // Kategori seçim listesi için yeni özellik
         public List<SelectListItem>? Categories { get; set; }
     }
 }

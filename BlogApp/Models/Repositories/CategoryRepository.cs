@@ -31,5 +31,17 @@ namespace BlogApp.Models.Repositories
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(Category category)
+        {
+            _context.Entry(category).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Category category)
+        {
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using BlogApp.Models.Context;
 using BlogApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-
+using System.Threading.Tasks;
 
 namespace BlogApp.Models.Repositories
 {
@@ -16,12 +16,17 @@ namespace BlogApp.Models.Repositories
 
         public async Task<User?> GetByIdAsync(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Users.FindAsync(id);
         }
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+
+        public async Task<User?> GetByEmailAsync(string email) // Yeni implementasyon
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task AddAsync(User user)
@@ -35,5 +40,7 @@ namespace BlogApp.Models.Repositories
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+        // public async Task DeleteAsync(User user) { ... }
     }
 }

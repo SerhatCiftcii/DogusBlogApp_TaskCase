@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -17,14 +18,16 @@ namespace BlogApp.ViewModels
         [Display(Name = "İçerik")]
         public string Content { get; set; } = null!;
 
-        [Display(Name = "Görsel URL")]
-        public string? ImageUrl { get; set; }
+        [Display(Name = "Yeni Görsel")]
+        public IFormFile? Image { get; set; } // Değiştirildi
+
+        [Display(Name = "Mevcut Görsel")]
+        public string? ImagePath { get; set; } // Mevcut görselin yolunu tutacak (veritabanından gelecek)
 
         [Required(ErrorMessage = "{0} alanı zorunludur.")]
         [Display(Name = "Kategori")]
         public int CategoryId { get; set; }
 
-        // Kategori seçim listesi için özellik (Açıkça tanımlıyoruz)
         public List<SelectListItem>? Categories { get; set; }
     }
 }

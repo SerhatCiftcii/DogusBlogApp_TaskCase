@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace BlogApp.Models.Entities
 {
@@ -22,8 +23,8 @@ namespace BlogApp.Models.Entities
         [Display(Name = "Yayınlanma Tarihi")]
         public DateTime PublishDate { get; set; }
 
-        [Display(Name = "Görsel URL")]
-        public string? ImageUrl { get; set; }
+        [Display(Name = "Görsel Yolu")] // Değiştirildi
+        public string? ImagePath { get; set; } // Değiştirildi
 
         // Foreign Key for User
         [Required(ErrorMessage = "{0} alanı zorunludur.")]

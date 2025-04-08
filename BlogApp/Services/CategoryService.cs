@@ -50,6 +50,23 @@ namespace BlogApp.Services
             await _categoryRepository.AddAsync(newCategory);
         }
 
-        // TODO: Güncelleme ve silme işlemleri eklenebilir.
+        public async Task UpdateCategoryAsync(CategoryViewModel model)
+        {
+            var existingCategory = await _categoryRepository.GetByIdAsync(model.Id);
+            if (existingCategory != null)
+            {
+                existingCategory.Name = model.Name;
+                await _categoryRepository.UpdateAsync(existingCategory);
+            }
+        }
+
+        public async Task DeleteCategoryAsync(int id)
+        {
+            var categoryToDelete = await _categoryRepository.GetByIdAsync(id);
+            if (categoryToDelete != null)
+            {
+                await _categoryRepository.DeleteAsync(categoryToDelete);
+            }
+        }
     }
 }
