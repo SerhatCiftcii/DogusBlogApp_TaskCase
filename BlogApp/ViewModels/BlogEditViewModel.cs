@@ -28,6 +28,9 @@ namespace BlogApp.ViewModels
         [Display(Name = "Kategori")]
         public int CategoryId { get; set; }
 
+
         public List<SelectListItem>? Categories { get; set; }
+
+        public int UserId { get; set; } // İşte eklenen UserId özelliği
     }
 }

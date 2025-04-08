@@ -1,6 +1,7 @@
 ﻿using BlogApp.Models.Context;
 using BlogApp.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BlogApp.Models.Repositories
 {
@@ -29,6 +30,33 @@ namespace BlogApp.Models.Repositories
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
 
+        // Yeni eklenen eager loading destekli metotlar
+        public async Task<List<Blog>> GetAllAsync(params Expression<Func<Blog, object>>[] includeProperties)
+        {
+            IQueryable<Blog> query = _context.Blogs;
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<Blog?> GetByIdAsync(int id, params Expression<Func<Blog, object>>[] includeProperties)
+        {
+            IQueryable<Blog> query = _context.Blogs.Where(b => b.Id == id);
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+            return await query.FirstOrDefaultAsync();
+        }
+
         public async Task AddAsync(Blog blog)
         {
             await _context.Blogs.AddAsync(blog);
@@ -46,14 +74,16 @@ namespace BlogApp.Models.Repositories
             _context.Blogs.Remove(blog);
             await _context.SaveChangesAsync();
         }
+
         public async Task<Blog?> GetBlogByIdWithCommentsAsync(int id)
         {
             return await _context.Blogs
+                .Where(b => b.Id == id)
                 .Include(b => b.User)
                 .Include(b => b.Category)
                 .Include(b => b.Comments)
-                    .ThenInclude(c => c.User) // Yorumu yazan kullanıcıyı da yükleyebiliriz
-                .FirstOrDefaultAsync(b => b.Id == id);
+                    .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync();
         }
     }
 }

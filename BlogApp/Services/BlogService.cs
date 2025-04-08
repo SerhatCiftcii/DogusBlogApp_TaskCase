@@ -31,7 +31,7 @@ namespace BlogApp.Services
 
         public async Task<List<BlogViewModel>> GetAllBlogsAsync()
         {
-            var blogs = await _blogRepository.GetAllAsync();
+            var blogs = await _blogRepository.GetAllAsync(b => b.User, b => b.Category);
             return blogs.Select(b => new BlogViewModel
             {
                 Id = b.Id,
@@ -40,6 +40,7 @@ namespace BlogApp.Services
                 PublishDate = b.PublishDate,
                 ImagePath = b.ImagePath,
                 AuthorUsername = b.User?.Username ?? "Bilinmeyen Yazar",
+                UserId = b.UserId,
                 CategoryName = b.Category?.Name ?? "Bilinmeyen Kategori",
                 CategoryId = b.CategoryId
             }).ToList();
@@ -47,7 +48,7 @@ namespace BlogApp.Services
 
         public async Task<BlogViewModel?> GetBlogByIdAsync(int id)
         {
-            var blog = await _blogRepository.GetByIdAsync(id);
+            var blog = await _blogRepository.GetByIdAsync(id, b => b.User, b => b.Category);
             if (blog == null)
             {
                 return null;
@@ -60,6 +61,7 @@ namespace BlogApp.Services
                 PublishDate = blog.PublishDate,
                 ImagePath = blog.ImagePath,
                 AuthorUsername = blog.User?.Username ?? "Bilinmeyen Yazar",
+                UserId = blog.UserId,
                 CategoryName = blog.Category?.Name ?? "Bilinmeyen Kategori",
                 CategoryId = blog.CategoryId
             };
@@ -80,6 +82,7 @@ namespace BlogApp.Services
                 PublishDate = blog.PublishDate,
                 ImagePath = blog.ImagePath,
                 AuthorUsername = blog.User?.Username ?? "Bilinmeyen Yazar",
+                UserId = blog.UserId,
                 CategoryName = blog.Category?.Name ?? "Bilinmeyen Kategori",
                 CategoryId = blog.CategoryId,
                 Comments = blog.Comments.Select(c => new CommentViewModel
@@ -131,6 +134,31 @@ namespace BlogApp.Services
             // TODO: Hata yönetimi eklenebilir.
         }
 
+        public async Task<BlogEditViewModel> GetBlogByIdForEditAsync(int id) // Düzenleme için özel metot
+        {
+            var blog = await _blogRepository.GetByIdAsync(id, b => b.Category); // Düzenleme için sadece Category yeterli olabilir
+            if (blog == null)
+            {
+                return null;
+            }
+            var categories = await _categoryRepository.GetAllAsync();
+            return new BlogEditViewModel
+            {
+                Id = blog.Id,
+                Title = blog.Title,
+                Content = blog.Content,
+                ImagePath = blog.ImagePath,
+                CategoryId = blog.CategoryId,
+                Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name,
+                    Selected = c.Id == blog.CategoryId
+                }).ToList(),
+                UserId = blog.UserId
+            };
+        }
+
         public async Task UpdateBlogAsync(BlogEditViewModel model, string? newImagePath)
         {
             var existingBlog = await _blogRepository.GetByIdAsync(model.Id);
@@ -174,7 +202,7 @@ namespace BlogApp.Services
 
         public async Task<List<BlogViewModel>> GetBlogsByCategoryAsync(int categoryId)
         {
-            var blogs = await _blogRepository.GetAllAsync();
+            var blogs = await _blogRepository.GetAllAsync(b => b.User, b => b.Category);
             return blogs.Where(b => b.CategoryId == categoryId)
                 .Select(b => new BlogViewModel
                 {
@@ -184,6 +212,7 @@ namespace BlogApp.Services
                     PublishDate = b.PublishDate,
                     ImagePath = b.ImagePath,
                     AuthorUsername = b.User?.Username ?? "Bilinmeyen Yazar",
+                    UserId = b.UserId,
                     CategoryName = b.Category?.Name ?? "Bilinmeyen Kategori",
                     CategoryId = b.CategoryId
                 }).ToList();

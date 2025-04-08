@@ -1,46 +1,69 @@
-﻿@model List<BlogViewModel>
+﻿@using System.Security.Claims
+@model List<BlogApp.ViewModels.BlogViewModel>
+<h1 class="display-4 fw-bold mb-4">Bloglar</h1>
 
-<h2>Blog Listesi</h2>
+<div class="mb-4">
+    <form asp-action="Index" method="get" class="row row-cols-lg-auto g-3 align-items-center">
+        <div class="col-12">
+            <label class="visually-hidden" for="categoryId">Kategori</label>
+            <select class="form-select" id="categoryId" name="categoryId" onchange="this.form.submit()">
+                <option value="">Tüm Kategoriler</option>
+                @foreach (var category in ViewBag.Categories as List<BlogApp.ViewModels.CategoryViewModel>)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                    @if (ViewBag.SelectedCategoryId == category.Id)
+                    {
+                        <script>
+                            document.getElementById('categoryId').value = '@category.Id';
+                        </script>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-outline-secondary">Filtrele</button>
+        </div>
+    </form>
+</div>
 
-<p>
-    <a asp-action="Create">Yeni Blog Oluştur</a>
-</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Başlık</th>
-            <th>Yayın Tarihi</th>
-            <th>Kategori</th>
-            <th>Yazar</th>
-            <th>Image</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<h2 class="fw-bold text-primary mb-3">Tüm Bloglar</h2>
+@if (Model != null && Model.Any())
+{
+    <div class="row g-4">
+        @foreach (var blog in Model)
         {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.PublishDate)</td>
-                <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
-                <td>@Html.DisplayFor(modelItem => item.AuthorUsername)</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.ImagePath))
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0 rounded-3">
+                    @if (!string.IsNullOrEmpty(blog.ImagePath))
                     {
-                        <img src="~/@item.ImagePath" alt="@item.Title" style="max-width: 50px;;" />
+                        <div class="overflow-hidden" style="height: 250px;">
+                            <img src="~/@blog.ImagePath" class="card-img-top img-fluid" style="object-fit: contain; height: 100%; width: 100%;" alt="@blog.Title">
+                        </div>
                     }
-                    else
-                    {
-                        <span>Görsel Yok</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">Detaylar</a> |
-                    <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Sil</a>
-                </td>
-            </tr>
+                    <div class="card-body d-flex flex-column p-4">
+                        <h5 class="card-title fw-bold text-truncate mb-3">@blog.Title</h5>
+                        <p class="card-text mb-3">@blog.Content.Substring(0, Math.Min(blog.Content.Length, 100)) ...</p>
+                        <div class="mt-auto">
+                            <p class="card-text mb-3">
+                                <span class="fw-bold">Yazar:</span> <span class="text-muted">@blog.AuthorUsername</span> -
+                                <span class="fw-bold">Kategori:</span> <span class="text-muted">@blog.CategoryName</span>
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@blog.Id" class="btn btn-primary fw-bold">Detaylar</a>
+                                @if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) == blog.UserId.ToString())
+                                {
+                                    <a asp-action="Edit" asp-route-id="@blog.Id" class="btn btn-warning fw-bold">Düzenle</a>
+                                    <a asp-action="Delete" asp-route-id="@blog.Id" class="btn btn-danger fw-bold">Sil</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}
+else
+{
+    <p class="alert alert-info">Bu kategoride henüz blog yayınlanmadı.</p>
+}

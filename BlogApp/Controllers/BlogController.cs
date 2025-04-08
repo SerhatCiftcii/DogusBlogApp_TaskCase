@@ -19,12 +19,30 @@ namespace BlogApp.Controllers
             _commentService = commentService;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var blogs = await _blogService.GetAllBlogsAsync();
-            return View(blogs);
-        }
 
+        public async Task<IActionResult> Index(int? categoryId)
+        {
+            var allBlogs = await _blogService.GetAllBlogsAsync();
+
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                allBlogs = allBlogs.Where(b => b.CategoryId == categoryId).ToList();
+            }
+
+            var categories = await _blogService.GetAllCategoriesAsync();
+            ViewBag.Categories = categories;
+            ViewBag.SelectedCategoryId = categoryId;
+
+            return View(allBlogs);
+        }
+        [Authorize]
+        public async Task<IActionResult> MyBlogs()
+        {
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var myBlogs = await _blogService.GetAllBlogsAsync(); // Tüm blogları al
+            var myBlogList = myBlogs.Where(b => b.UserId.ToString() == loggedInUserId).ToList();
+            return View(myBlogList); // Yeni bir View'a gönder
+        }
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || id <= 0)
@@ -89,6 +107,13 @@ namespace BlogApp.Controllers
                 return NotFound();
             }
 
+            // Yetkilendirme kontrolü: Sadece kendi yazısını düzenleyebilir
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (blogViewModel.UserId.ToString() != loggedInUserId)
+            {
+                return Forbid(); // 403 Yetkisiz Erişim hatası döndür
+            }
+
             var categories = await _blogService.GetAllCategoriesAsync();
             var editViewModel = new BlogEditViewModel
             {
@@ -118,6 +143,19 @@ namespace BlogApp.Controllers
                 return BadRequest();
             }
 
+            var existingBlog = await _blogService.GetBlogByIdAsync(id);
+            if (existingBlog == null)
+            {
+                return NotFound();
+            }
+
+            // Yetkilendirme kontrolü: Sadece kendi yazısını düzenleyebilir
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (existingBlog.UserId.ToString() != loggedInUserId)
+            {
+                return Forbid(); // 403 Yetkisiz Erişim hatası döndür
+            }
+
             if (ModelState.IsValid)
             {
                 string? newImagePath = null;
@@ -125,7 +163,7 @@ namespace BlogApp.Controllers
                 if (model.Image != null && model.Image.Length > 0)
                 {
                     // Resim kaydetme işi Service katmanında
-                    // newImagePath = await _blogService.SaveImageAsync(model.Image); 
+                    // newImagePath = await _blogService.SaveImageAsync(model.Image);
                 }
 
                 await _blogService.UpdateBlogAsync(model, newImagePath);
@@ -157,19 +195,41 @@ namespace BlogApp.Controllers
                 return NotFound();
             }
 
+            // Yetkilendirme kontrolü: Sadece kendi yazısını silebilir
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (blogViewModel.UserId.ToString() != loggedInUserId)
+            {
+                return Forbid(); // 403 Yetkisiz Erişim hatası döndür
+            }
+
             return View(blogViewModel);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
+        [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var blog = await _blogService.GetBlogByIdAsync(id);
+            if (blog == null)
+            {
+                return NotFound();
+            }
+
+            // Yetkilendirme kontrolü: Sadece kendi yazısını silebilir
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (blog.UserId.ToString() != loggedInUserId)
+            {
+                return Forbid(); // 403 Yetkisiz Erişim hatası döndür
+            }
+
             // Silme işlemini gerçekleştir
             await _blogService.DeleteBlogAsync(id);
 
             // Blog listesine yönlendir
             return RedirectToAction("Index");
         }
+
         // Yorum ekleme action'ı
         [HttpPost]
         [Authorize]
