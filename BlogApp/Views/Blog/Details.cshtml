@@ -1,56 +1,108 @@
-﻿@model BlogViewModel
+﻿@model BlogApp.ViewModels.BlogViewModel
 @using Microsoft.AspNetCore.Authorization
 
 @{
     ViewData["Title"] = Model.Title;
 }
 
-<h1>@Model.Title</h1>
-<p>@Model.Content</p>
-<p>@Html.DisplayNameFor(model => model.PublishDate): @Model.PublishDate.ToShortDateString()</p>
-<p>@Html.DisplayNameFor(model => model.CategoryName): @Model.CategoryName</p>
-<p>@Html.DisplayNameFor(model => model.AuthorUsername): @Model.AuthorUsername</p>
+<div class="container my-4">
+    <div class="row">
+        <!-- Left Column (Image & Title) -->
+        <div class="col-lg-6 mb-4">
+            <h1 class="display-5 fw-bold mb-4">Başlık :@Model.Title</h1>
 
-<hr />
-
-<div>
-    <h4>Yorumlar</h4>
-    @if (Model.Comments != null && Model.Comments.Any())
-    {
-        <ul>
-            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedDate))
+            @if (!string.IsNullOrEmpty(Model.ImagePath))
             {
-                <li>
-                    <strong>@comment.AuthorUsername:</strong> @comment.Text (@comment.CreatedDate.ToShortDateString())
-                </li>
+                <div class="mb-4">
+                    <img src="~/@Model.ImagePath" alt="@Model.Title"
+                         class="card-img-top img-fluid" style="object-fit: contain; height: 100%; width: 70%;">
+                </div>
             }
-        </ul>
-    }
-    else
-    {
-        <p>Henüz yorum yapılmamış.</p>
-    }
-</div>
-
-<hr />
-
-@if (User.Identity.IsAuthenticated)
-{
-    <h4>Yorum Ekle</h4>
-    <form asp-controller="Blog" asp-action="AddComment" method="post">
-        <div class="form-group">
-            <label for="Text">@Html.DisplayNameFor(model => model.Comments.FirstOrDefault().Text):</label>
-            <textarea class="form-control" id="Text" name="Text" rows="3" required></textarea>
         </div>
-        <input type="hidden" name="BlogId" value="@Model.Id" />
-        <button type="submit" class="btn btn-primary">Yorum Gönder</button>
-    </form>
-}
-else
-{
-    <p>Yorum yapmak için <a asp-controller="Auth" asp-action="Login">giriş yapın</a>.</p>
-}
+
+        <!-- Right Column (Metadata & Comment Form) -->
+        <div class="col-lg-6">
+            <div class="blog-meta mb-4">
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <span class="text-muted">
+                        <i class="far fa-calendar-alt me-2"></i> @Html.DisplayNameFor(model => model.PublishDate): @Model.PublishDate.ToShortDateString()
+                    </span>
+                    <span class="fw-bold text-info">
+                        <i class="fas fa-tag me-2"></i>@Html.DisplayNameFor(model => model.CategoryName): @Model.CategoryName
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(model => model.AuthorUsername): @Model.AuthorUsername
+                    </span>
+                </div>
+            </div>
+
+            <!-- Comment Form Section -->
+            <div class="comment-form mt-auto">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3">
+                                <i class="fas fa-comment-alt me-2"></i> Yorum Yap
+                            </h5>
+                            <form asp-controller="Blog" asp-action="AddComment" method="post">
+                                <div class="mb-3">
+                                    <textarea name="Text" class="form-control" rows="3"
+                                              placeholder="Yorumunuzu buraya yazın..." required></textarea>
+                                </div>
+                                <input type="hidden" name="BlogId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i> Gönder
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-light text-center">
+                        Yorum yapmak için <a asp-controller="Auth" asp-action="Login" class="fw-bold">giriş yapın</a>
+                        <i class="fas fa-sign-in-alt ms-2"></i>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Content -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <article class="blog-content lead py-3 px-lg-5">
+             İçerik :   @Model.Content
+            </article>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="comments-section border-top pt-4">
+                <h4 class="mb-4 fw-bold">
+                    <i class="fas fa-comments me-2"></i> Yorumlar
+                </h4>
+                @await Html.PartialAsync("_CommentList", Model.Comments)
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+    .blog-content {
+        line-height: 1.8;
+        font-size: 1.1rem;
+    }
+
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+        }
+</style>

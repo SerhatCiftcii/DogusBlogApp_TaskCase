@@ -1,0 +1,21 @@
+﻿@model List<BlogApp.ViewModels.CommentViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="list-unstyled">
+        @foreach (var comment in Model.OrderByDescending(c => c.CreatedDate))
+        {
+            <li class="media mb-3 p-3 border rounded shadow-sm bg-light">
+                <i class="fas fa-user-circle fa-3x mr-3"></i>
+                <div class="media-body">
+                    <h6 class="mt-0 mb-1 text-primary fw-bold">@comment.AuthorUsername <small class="text-muted">(@comment.CreatedDate.ToShortDateString())</small></h6>
+                    <p class="mb-0">@comment.Text</p>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-center  text-bg-warning ">Henüz yorum yapılmamış. <i class="far fa-comment-dots"></i></p>
+}

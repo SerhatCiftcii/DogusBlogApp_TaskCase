@@ -30,7 +30,7 @@ namespace BlogApp.Models.Repositories
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        // Yeni eklenen eager loading destekli metotlar
+        
         public async Task<List<Blog>> GetAllAsync(params Expression<Func<Blog, object>>[] includeProperties)
         {
             IQueryable<Blog> query = _context.Blogs;
