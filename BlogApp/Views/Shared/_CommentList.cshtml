@@ -1,21 +1,34 @@
 ﻿@model List<BlogApp.ViewModels.CommentViewModel>
 
-@if (Model != null && Model.Any())
-{
-    <ul class="list-unstyled">
-        @foreach (var comment in Model.OrderByDescending(c => c.CreatedDate))
+<div class="comments-list">
+    @if (Model != null && Model.Any())
+    {
+        foreach (var comment in Model.OrderByDescending(c => c.CreatedDate))
         {
-            <li class="media mb-3 p-3 border rounded shadow-sm bg-light">
-                <i class="fas fa-user-circle fa-3x mr-3"></i>
-                <div class="media-body">
-                    <h6 class="mt-0 mb-1 text-primary fw-bold">@comment.AuthorUsername <small class="text-muted">(@comment.CreatedDate.ToShortDateString())</small></h6>
+            <div class="comment-item d-flex gap-3 mb-4 pb-4 border-bottom">
+                <div class="comment-avatar">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <i class="fas fa-user text-primary"></i>
+                    </div>
+                </div>
+                <div class="comment-content flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0 fw-bold">@comment.AuthorUsername</h5>
+                        <small class="text-muted">
+                            <i class="far fa-clock me-1"></i> @comment.CreatedDate.ToShortDateString()
+                        </small>
+                    </div>
                     <p class="mb-0">@comment.Text</p>
                 </div>
-            </li>
+            </div>
         }
-    </ul>
-}
-else
-{
-    <p class="text-center  text-bg-warning ">Henüz yorum yapılmamış. <i class="far fa-comment-dots"></i></p>
-}
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="far fa-comment-dots fa-3x text-muted mb-3"></i>
+            <h5 class="fw-bold text-muted">Henüz yorum yapılmamış</h5>
+            <p class="text-muted mb-0">İlk yorumu sen yap!</p>
+        </div>
+    }
+</div>

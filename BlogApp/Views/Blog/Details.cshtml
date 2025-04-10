@@ -5,87 +5,96 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="container my-4">
-    <div class="row">
-        <!-- Left Column (Image & Title) -->
-        <div class="col-lg-6 mb-4">
-            <h1 class="display-5 fw-bold mb-4">Başlık :@Model.Title</h1>
-
-            @if (!string.IsNullOrEmpty(Model.ImagePath))
-            {
-                <div class="mb-4">
-                    <img src="~/@Model.ImagePath" alt="@Model.Title"
-                         class="card-img-top img-fluid" style="object-fit: contain; height: 100%; width: 70%;">
-                </div>
-            }
-        </div>
-
-        <!-- Right Column (Metadata & Comment Form) -->
-        <div class="col-lg-6">
-            <div class="blog-meta mb-4">
-                <div class="d-flex flex-wrap gap-3 mb-3">
-                    <span class="text-muted">
-                        <i class="far fa-calendar-alt me-2"></i> @Html.DisplayNameFor(model => model.PublishDate): @Model.PublishDate.ToShortDateString()
-                    </span>
-                    <span class="fw-bold text-info">
-                        <i class="fas fa-tag me-2"></i>@Html.DisplayNameFor(model => model.CategoryName): @Model.CategoryName
-                    </span>
-                    <span class="text-muted">
-                        <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(model => model.AuthorUsername): @Model.AuthorUsername
-                    </span>
-                </div>
-            </div>
-
-            <!-- Comment Form Section -->
-            <div class="comment-form mt-auto">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold mb-3">
-                                <i class="fas fa-comment-alt me-2"></i> Yorum Yap
-                            </h5>
-                            <form asp-controller="Blog" asp-action="AddComment" method="post">
-                                <div class="mb-3">
-                                    <textarea name="Text" class="form-control" rows="3"
-                                              placeholder="Yorumunuzu buraya yazın..." required></textarea>
-                                </div>
-                                <input type="hidden" name="BlogId" value="@Model.Id" />
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i> Gönder
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-light text-center">
-                        Yorum yapmak için <a asp-controller="Auth" asp-action="Login" class="fw-bold">giriş yapın</a>
-                        <i class="fas fa-sign-in-alt ms-2"></i>
-                    </div>
-                }
+<div class="container py-4">
+    <!-- Blog Header Section -->
+    <div class="row mb-4">
+        <div class="col-lg-10 mx-auto text-center">
+            <h1 class="display-5 fw-bold mb-3">@Model.Title</h1>
+            <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+                    <i class="fas fa-folder me-1"></i> @Html.DisplayNameFor(model => model.CategoryName): @Model.CategoryName
+                </span>
+                <span class="badge bg-secondary rounded-pill px-3 py-2">
+                    <i class="far fa-calendar-alt me-1"></i> @Html.DisplayNameFor(model => model.PublishDate): @Model.PublishDate.ToShortDateString()
+                </span>
+                <span class="badge bg-info text-dark rounded-pill px-3 py-2">
+                    <i class="fas fa-user me-1"></i> @Html.DisplayNameFor(model => model.AuthorUsername): @Model.AuthorUsername
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Blog Content -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <article class="blog-content lead py-3 px-lg-5">
-             İçerik :   @Model.Content
+    <!-- Featured Image - Daha Kompakt -->
+    @if (!string.IsNullOrEmpty(Model.ImagePath))
+    {
+        <div class="row mb-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="featured-image-container rounded-3 overflow-hidden shadow">
+                    <img src="~/@Model.ImagePath" alt="@Model.Title" class="img-fluid w-100" style="max-height: 350px; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Content Section - Daha Belirgin -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <article class="blog-content bg-white p-4 rounded-3 shadow-sm border-start border-5 border-primary">
+                <h4 class="text-primary mb-3"><i class="fas fa-file-alt me-2"></i>İçerik</h4>
+                <div class="content-text">
+                    @Model.Content
+                </div>
             </article>
         </div>
     </div>
 
     <!-- Comments Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="comments-section border-top pt-4">
-                <h4 class="mb-4 fw-bold">
-                    <i class="fas fa-comments me-2"></i> Yorumlar
-                </h4>
-                @await Html.PartialAsync("_CommentList", Model.Comments)
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow-sm mb-4 rounded-3 overflow-hidden">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="fs-4 fw-bold mb-0">
+                        <i class="fas fa-comments me-2 text-primary"></i> Yorumlar
+                    </h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="comments-container p-4">
+                        @await Html.PartialAsync("_CommentList", Model.Comments)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comment Form -->
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+                <div class="card-header bg-white border-0 py-3">
+                    <h3 class="fs-4 fw-bold mb-0">
+                        <i class="fas fa-comment-alt me-2 text-primary"></i> Yorum Yap
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <form asp-controller="Blog" asp-action="AddComment" method="post">
+                            <div class="mb-3">
+                                <textarea name="Text" class="form-control border bg-light" rows="3"
+                                          placeholder="Düşüncelerinizi paylaşın..." required></textarea>
+                            </div>
+                            <input type="hidden" name="BlogId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-paper-plane me-2"></i> Gönder
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light border bg-light p-3 text-center">
+                            <p class="mb-2">Yorum yapmak için hesabınıza giriş yapmalısınız</p>
+                            <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary px-4">
+                                <i class="fas fa-sign-in-alt me-2"></i> Giriş Yap
+                            </a>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -97,12 +106,29 @@
 
 <style>
     .blog-content {
-        line-height: 1.8;
-        font-size: 1.1rem;
+        line-height: 1.7;
     }
+
+        .blog-content .content-text {
+            font-size: 1.1rem;
+            color: #333;
+        }
 
         .blog-content img {
             max-width: 100%;
             height: auto;
+            border-radius: 6px;
+            margin: 1rem 0;
         }
+
+    .featured-image-container {
+        position: relative;
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
 </style>

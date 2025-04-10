@@ -87,6 +87,10 @@ namespace BlogApp.Controllers
             }
             return View(model);
         }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
         public async Task<IActionResult> Logout()
         {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
 // Veritabaný baðlantýsýný yapýlandýrma
@@ -32,9 +32,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.LoginPath = "/Auth/Login"; // Giriþ yapmamýþ kullanýcýlarýn yönlendirileceði sayfa
         options.LogoutPath = "/Auth/Logout"; // Çýkýþ yapýldýðýnda yönlendirilecek sayfa
-        options.AccessDeniedPath = "/Auth/AccessDenied"; // Yetkisiz eriþim durumunda yönlendirilecek sayfa (isteðe baðlý)
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie'nin geçerlilik süresi (isteðe baðlý)
-        options.SlidingExpiration = true; // Kullanýcý aktif oldukça cookie süresini uzat (isteðe baðlý)
+        options.AccessDeniedPath = "/Auth/AccessDenied"; // Yetkisiz eriþim durumunda yönlendirilecek sayfa (isteðe baðlý) //beným sayfamda yaptým ama admýn rolu olmadðýndan þuan aktife deðil.
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Cookie'nin geçerlilik süresi 
+        options.SlidingExpiration = true; // Kullanýcý aktif oldukça cookie süresini uzat 
         options.Cookie.HttpOnly = true; // JavaScript'in cookie'ye eriþimini engelle (güvenlik için önemli)
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // HTTPS üzerinde çalýþýrken güvenli cookie (önerilir)
         options.Cookie.SameSite = SameSiteMode.Strict; // Siteler arasý isteklerde cookie gönderimini kýsýtla (güvenlik için önemli)

@@ -1,69 +1,126 @@
 ﻿@using System.Security.Claims
 @model List<BlogApp.ViewModels.BlogViewModel>
-<h1 class="display-4 fw-bold mb-4">Bloglar</h1>
 
-<div class="mb-4">
-    <form asp-action="Index" method="get" class="row row-cols-lg-auto g-3 align-items-center">
-        <div class="col-12">
-            <label class="visually-hidden" for="categoryId">Kategori</label>
-            <select class="form-select" id="categoryId" name="categoryId" onchange="this.form.submit()">
-                <option value="">Tüm Kategoriler</option>
-                @foreach (var category in ViewBag.Categories as List<BlogApp.ViewModels.CategoryViewModel>)
-                {
-                    <option value="@category.Id">@category.Name</option>
-                    @if (ViewBag.SelectedCategoryId == category.Id)
-                    {
-                        <script>
-                            document.getElementById('categoryId').value = '@category.Id';
-                        </script>
-                    }
-                }
-            </select>
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold text-dark mb-0">Bloglar</h1>
         </div>
-        <div class="col-12">
-            <button type="submit" class="btn btn-outline-secondary">Filtrele</button>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-body p-3">
+                    <form asp-action="Index" method="get" class="d-flex flex-column flex-sm-row gap-2">
+                        <select class="form-select form-select-lg border-0 bg-light" id="categoryId" name="categoryId">
+                            <option value="">Tüm Kategoriler</option>
+                            @foreach (var category in ViewBag.Categories as List<BlogApp.ViewModels.CategoryViewModel>)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                                @if (ViewBag.SelectedCategoryId == category.Id)
+                                {
+                                    <script>
+                                        document.getElementById('categoryId').value = '@category.Id';
+                                    </script>
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-filter me-2"></i> Filtrele
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
+    </div>
 
-<h2 class="fw-bold text-primary mb-3">Tüm Bloglar</h2>
-@if (Model != null && Model.Any())
-{
-    <div class="row g-4">
-        @foreach (var blog in Model)
-        {
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm border-0 rounded-3">
-                    @if (!string.IsNullOrEmpty(blog.ImagePath))
-                    {
-                        <div class="overflow-hidden" style="height: 250px;">
-                            <img src="~/@blog.ImagePath" class="card-img-top img-fluid" style="object-fit: contain; height: 100%; width: 100%;" alt="@blog.Title">
+    @if (Model != null && Model.Any())
+    {
+        <!-- Blog Grid - All Posts -->
+        <h2 class="fw-bold mb-4">
+            <i class="fas fa-th-large me-2 text-primary"></i> Tüm Bloglar
+        </h2>
+        <div class="row g-4">
+            @foreach (var blog in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3 blog-card">
+                        <div class="position-relative">
+                            @if (!string.IsNullOrEmpty(blog.ImagePath))
+                            {
+                                <div class="card-img-container" style="height: 220px;">
+                                    <img src="~/@blog.ImagePath" class="card-img-top" style="object-fit: cover; height: 100%; width: 100%;" alt="@blog.Title">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                    <i class="fas fa-file-alt fa-3x text-muted"></i>
+                                </div>
+                            }
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-3">@blog.CategoryName</span>
                         </div>
-                    }
-                    <div class="card-body d-flex flex-column p-4">
-                        <h5 class="card-title fw-bold text-truncate mb-3">@blog.Title</h5>
-                        <p class="card-text mb-3">@blog.Content.Substring(0, Math.Min(blog.Content.Length, 100)) ...</p>
-                        <div class="mt-auto">
-                            <p class="card-text mb-3">
-                                <span class="fw-bold">Yazar:</span> <span class="text-muted">@blog.AuthorUsername</span> -
-                                <span class="fw-bold">Kategori:</span> <span class="text-muted">@blog.CategoryName</span>
-                            </p>
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h3 class="card-title h5 fw-bold mb-3">@blog.Title</h3>
+                            <p class="card-text flex-grow-1 mb-3">@blog.Content.Substring(0, Math.Min(blog.Content.Length, 100))...</p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i> @blog.AuthorUsername
+                                </small>
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i> @blog.PublishDate.ToShortDateString()
+                                </small>
+                            </div>
                             <div class="d-flex gap-2">
-                                <a asp-action="Details" asp-route-id="@blog.Id" class="btn btn-primary fw-bold">Detaylar</a>
+                                <a asp-action="Details" asp-route-id="@blog.Id" class="btn btn-outline-primary flex-grow-1">
+                                    <i class="fas fa-book-reader me-1"></i> Oku
+                                </a>
                                 @if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) == blog.UserId.ToString())
                                 {
-                                    <a asp-action="Edit" asp-route-id="@blog.Id" class="btn btn-warning fw-bold">Düzenle</a>
-                                    <a asp-action="Delete" asp-route-id="@blog.Id" class="btn btn-danger fw-bold">Sil</a>
+                                    <a asp-action="Edit" asp-route-id="@blog.Id" class="btn btn-outline-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@blog.Id" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm p-5 text-center">
+            <div class="py-5">
+                <i class="fas fa-newspaper fa-4x text-muted mb-3"></i>
+                <h3 class="fw-bold">Bu kategoride henüz blog yayınlanmadı.</h3>
+                <p class="text-muted mb-0">Daha sonra tekrar kontrol edin veya başka bir kategori seçin.</p>
             </div>
+        </div>
+    }
+</div>
+
+<style>
+    .blog-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
         }
-    </div>
-}
-else
-{
-    <p class="alert alert-info">Bu kategoride henüz blog yayınlanmadı.</p>
-}
+
+    .card-img-container {
+        overflow: hidden;
+    }
+
+        .card-img-container img {
+            transition: transform 0.5s ease;
+        }
+
+    .blog-card:hover .card-img-container img {
+        transform: scale(1.05);
+    }
+</style>
